@@ -1,0 +1,45 @@
+Pearson_correlation <- data.frame(Product1= character(0), Product2= character(0), correlation = numeric(0),stringsAsFactors=FALSE)
+
+for(i in 1:length(Products)){
+  P1 <- filter(musical_ratings, Product == Products[i])
+  m = i+1
+  if(m <= length(Products)){
+    for (j in m:length(Products)){
+      P2 <- filter(musical_ratings, Product == Products[j])
+      P1P2 <- rbind(P1,P2)
+      data <- spread(P1P2,Product,Ratings)
+      data <- na.omit(data)
+      if(length(data) == 0){
+        Pearson_correlation <- Pearson_correlation
+      }
+      else{
+        mean1 <- mean(data[,2])
+        mean2 <- mean(data[,3])
+        data[,2] <- data[,2] - mean1
+        data[,2] <- data[,3] - mean2
+        data <- mutate(data, P1P2 = data[,2]*data[,3])
+        data <- mutate(data, P1sq = data[,2]^2)
+        data <- mutate(data, P2sq = data[,3]^2)
+        t <- sum(data$P1P2)/((sum(data$P1sq)*sum(data$P2sq))^0.5)
+        y <- list(P1 = Products[i], P2 = Products[j],corr = t)
+        y <- as.data.frame(y)
+        Pearson_correlation <- rbind(Pearson_correlation,y)
+        P2 <- NULL
+        P1P2 <- NULL
+        data <- NULL
+        t <- NULL
+        y <- NULL
+      } 
+    }
+    P1 <- NULL
+  }
+}
+
+object.size(Pearson_correlation)
+object.size(pearson_correlation)
+
+Pearson_correlation1 <- Pearson_correlation
+na.omit(Pearson_correlation1)
+
+
+
